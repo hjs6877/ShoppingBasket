@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Shopping Basket</string>
+    <string name="isPurchased">isPurchased</string>
+</resources>

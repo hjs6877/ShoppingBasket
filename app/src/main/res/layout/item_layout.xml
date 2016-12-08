@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="7dp"
+    >
+    <CheckBox
+        android:id="@+id/itemChkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:focusable="false"
+        android:focusableInTouchMode="false"/>
+    <TextView
+        android:id="@+id/itemText"
+        android:layout_width="242dp"
+        android:layout_height="wrap_content"
+        android:text="Item Text#"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:background="#ff0000"/>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/itemPurchasedButton"
+            android:layout_width="60dp"
+            android:layout_height="32dp"
+            android:text="구매전"
+            android:background="@xml/button_selector"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="5dp"/>
+    </RelativeLayout>
+
+
+</LinearLayout>
