@@ -84,10 +84,14 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
         }
 
         CartItem cartItem = getItem(position);
-        viewHolder.itemCheckBox.setChecked(cartItem.isChecked());
+        boolean isChecked = cartItem.isChecked() == 1 ? true : false;
+        boolean isPurchased = cartItem.isPurchased() == 1 ? true : false;
+        String buttonText = cartItem.isPurchased() == 1 ? "구매완료" : "구매전";
+
+        viewHolder.itemCheckBox.setChecked(isChecked);
         viewHolder.itemTextView.setText(cartItem.getItemText());
-        viewHolder.itemPurchasedButton.setText(cartItem.getButtonText());
-        viewHolder.itemPurchasedButton.setTag(R.string.isPurchased, cartItem.isPurchased());
+        viewHolder.itemPurchasedButton.setText(buttonText);
+        viewHolder.itemPurchasedButton.setTag(R.string.isPurchased, isPurchased);
 
         viewHolder.itemPurchasedButton.setOnClickListener(new ItemPurchasedButtonClickListener());
         return view;
@@ -99,7 +103,7 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
         public void onClick(View v) {
             Button button = (Button) v;
             /**
-             * TODO
+             * TODO DB 데이터 업데이트가 완료되고 난 후, 아래 작업 진행.
              * 1. CartItem isPurchased가 false이면
              *      - isPurchased를 true로 변경
              *      - 버튼 텍스트를 '구매완료'로 변경
