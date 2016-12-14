@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Shopping Basket</string>
     <string name="isPurchased">isPurchased</string>
+    <string name="toast_no_input_item">추가할 아이템을 입력하세요.</string>
 </resources>

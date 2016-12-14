@@ -5,23 +5,33 @@ package com.soom.shoppingbasket.model;
  */
 
 public class CartItem {
-    private boolean isChecked;
-    private boolean isPurchased;
-    private String buttonText;
+    private int regId;
+    private int isChecked;
+    private int isPurchased;
     private String itemText;
 
-    public CartItem(boolean isChecked, boolean isPurchased, String buttonText, String itemText) {
-        this.buttonText = buttonText;
+    public CartItem(int isChecked, int isPurchased, String itemText) {
         this.isChecked = isChecked;
         this.isPurchased = isPurchased;
         this.itemText = itemText;
     }
 
-    public boolean isChecked() {
+    public CartItem(int regId, int isChecked, int isPurchased, String itemText) {
+        this.regId = regId;
+        this.isChecked = isChecked;
+        this.isPurchased = isPurchased;
+        this.itemText = itemText;
+    }
+
+    public int getRegId(){
+        return regId;
+    }
+
+    public int isChecked() {
         return isChecked;
     }
 
-    public void setChecked(boolean checked) {
+    public void setChecked(int checked) {
         isChecked = checked;
     }
 
@@ -33,19 +43,21 @@ public class CartItem {
         this.itemText = itemText;
     }
 
-    public boolean isPurchased() {
+    public int isPurchased() {
         return isPurchased;
     }
 
-    public void setPurchased(boolean purchased) {
+    public void setPurchased(int purchased) {
         isPurchased = purchased;
     }
 
-    public String getButtonText() {
-        return buttonText;
-    }
+    public Object[] getCartItemDataArray(){
+        Object[] cartItemData = {
+                this.isChecked,
+                this.isPurchased,
+                this.itemText
+        };
 
-    public void setButtonText(String buttonText) {
-        this.buttonText = buttonText;
+        return cartItemData;
     }
 }
