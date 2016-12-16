@@ -80,16 +80,18 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // 아이템 조회
         dbController = new DBController(this);
         dbController.openDb();
         cartItemList = dbController.selectAll(SQLData.SQL_SELECT_ALL_ITEM);
         dbController.closeDb();
 
+        // 리스트뷰에 어댑터 연결.
         itemListView = (ListView) findViewById(R.id.itemListView);
         adapter = new CartItemListAdapter(this, R.layout.item_layout, cartItemList);
         itemListView.setAdapter(adapter);
 
-
+        // 아이템 입력을 위한 이벤트 리스너 등록.
         editItemText = (EditText) findViewById(R.id.editItemText);
         buttonAdd = (Button) findViewById(R.id.buttonAdd);
         buttonAdd.setOnClickListener(new ItemAddClickListener(this));
