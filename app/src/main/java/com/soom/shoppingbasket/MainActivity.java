@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,11 +17,15 @@ import com.soom.shoppingbasket.database.DBController;
 import com.soom.shoppingbasket.database.SQLData;
 import com.soom.shoppingbasket.model.CartItem;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * TODO
- * - 아이템 삭제
+ * - 아이템 추가 EditText 영역 배경 추가, 상단 라인 추가
  * - 아이템 수정
  * - 아이템 구매 상태 변경
  */
@@ -101,5 +106,36 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Map<Integer, CartItem> checkedItemMap = adapter.getCheckedItemMap();
+        List<Integer> checkedCartItemList = new ArrayList<>();
+        for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
+            CartItem cartItem = map.getValue();
+            int regId = cartItem.getRegId();
+            checkedCartItemList.add(regId);
+        }
+
+        switch (item.getItemId()){
+            /**
+             * - DB에서 item 삭제.
+             * - cartItemList에서 item 삭제
+             * - item 갱신
+             */
+            case R.id.action_item_delete:
+                DBController dbController = new DBController(this);
+                dbController.openDb();
+                for(int regId : checkedCartItemList){
+                    dbController.deleteData(SQLData.SQL_DELETE_ITEM, regId);
+                }
+                dbController.closeDb();
+                adapter.removeItems(checkedCartItemList);
+                adapter.notifyDataSetChanged();
+                Toast.makeText(this, "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -60,9 +60,9 @@ public class DBController {
         this.sqLiteDatabase.execSQL(sql, sqlData);
     }
 
-    public void deleteData(String sql, CartItem cartItem){
+    public void deleteData(String sql, int regId){
         Log.d(TAG, "## delete from cart_item table.");
-        Object[] sqlData = new Object[]{cartItem.getRegId()};
+        Object[] sqlData = new Object[]{regId};
         this.sqLiteDatabase.execSQL(sql, sqlData);
     }
 
