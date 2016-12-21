@@ -25,7 +25,10 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * TODO
- * - 아이템 추가 EditText 영역 배경 추가, 상단 라인 추가
+ * - 아이템 추가 시, 추가 한 아이템이 리스트 상단에 보이도록 리스트 정렬
+ * (1) 테이블에 create_date, update_date 컬럼 추가
+ * (2) SQLiteOpenHelper 클래스에서 테이블 업그레이드
+ * (3) apk를 지우고 실행을 다시 해본다.
  * - 아이템 수정
  * - 아이템 구매 상태 변경
  */
