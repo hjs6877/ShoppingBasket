@@ -13,11 +13,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.soom.shoppingbasket.adapter.CartItemListAdapter;
+import com.soom.shoppingbasket.comparator.CartItemComparator;
 import com.soom.shoppingbasket.database.DBController;
 import com.soom.shoppingbasket.database.SQLData;
 import com.soom.shoppingbasket.model.CartItem;
+import com.soom.shoppingbasket.utils.DateUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,12 +28,14 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * TODO
- * - 아이템 추가 시, 추가 한 아이템이 리스트 상단에 보이도록 리스트 정렬
- * (1) 테이블에 create_date, update_date 컬럼 추가
- * (2) SQLiteOpenHelper 클래스에서 테이블 업그레이드
- * (3) apk를 지우고 실행을 다시 해본다.
- * - 아이템 수정
- * - 아이템 구매 상태 변경
+ * (1) 아이템 추가 영역의 배경 설정.(ㅇ)
+ * (2) 아이템 추가 시, 추가 한 아이템이 리스트 상단에 보이도록 리스트 정렬(ㅇ)
+ *      - 테이블에 create_date, update_date 컬럼 추가(ㅇ)
+ *      - apk를 지우고 실행을 다시 해본다.(ㅇ)
+ *      - SQLite DB 브라우저에서 확인(ㅇ)
+ * (3) 아이템 수정
+ * (4) 아이템 구매 상태 변경
+ * (5) delete 아이콘 표시
  */
 public class MainActivity extends AppCompatActivity {
     private ListView itemListView;
@@ -64,13 +69,15 @@ public class MainActivity extends AppCompatActivity {
             if(itemText.isEmpty()){
                 Toast.makeText(context, R.string.toast_no_input_item, Toast.LENGTH_SHORT).show();
             }else{
+                String currentDate = DateUtil.currentDateToString();
                 // DB에 아이템 추가
                 dbController.openDb();
-                dbController.insertData(SQLData.SQL_INSERT_ITEM, new CartItem(0, 0, itemText));
+                dbController.insertData(SQLData.SQL_INSERT_ITEM, new CartItem(0, 0, itemText,currentDate, currentDate));
                 dbController.closeDb();
 
                 // 리스트뷰에 아이템 추가 및 갱신
-                cartItemList.add(new CartItem(0, 0, itemText));
+                cartItemList.add(new CartItem(0, 0, itemText, currentDate, currentDate));
+                Collections.sort(cartItemList, new CartItemComparator());
                 adapter.notifyDataSetChanged();
 
                 // editText의 텍스트 지워서 초기화.

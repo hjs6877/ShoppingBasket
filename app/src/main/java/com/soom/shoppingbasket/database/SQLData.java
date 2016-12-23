@@ -10,21 +10,23 @@ public class SQLData {
                 "(reg_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "is_checked INTEGER NOT NULL, " +
                 "is_purchased INTEGER NOT NULL, " +
-                "item TEXT NOT NULL)";
+                "item TEXT NOT NULL, " +
+                "create_date DATETIME, " +
+                "update_date DATETIME)";
 
     public static final String SQL_INSERT_ITEM
             = "INSERT INTO cart_item " +
-                "(is_checked, is_purchased, item) " +
-                "VALUES (?, ?, ?)";
+                "(is_checked, is_purchased, item, create_date, update_date) " +
+                "VALUES (?, ?, ?, datetime('now'), datetime('now'))";
 
     public static final String SQL_UPDATE_ITEM
             = "UPDATE cart_item " +
-                "SET is_checked=?, is_purchased=?, item=? " +
+                "SET is_checked=?, is_purchased=?, item=?, update_date=datetime('now')" +
                 "WHERE reg_id = ?";
 
     public static final String SQL_DELETE_ITEM
             = "DELETE FROM cart_item WHERE reg_id=?";
 
     public static final String SQL_SELECT_ALL_ITEM
-            = "SELECT * FROM cart_item ORDER BY reg_id";
+            = "SELECT * FROM cart_item ORDER BY create_date DESC";
 }

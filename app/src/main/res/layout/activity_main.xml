@@ -17,21 +17,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:weightSum="6">
-        <EditText
-            android:id="@+id/editItemText"
-            android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:background="#ffffff">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#cacbcf"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"></LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="추가할 아이템 입력"
-            android:textSize="20dp"
-            android:layout_weight="5"/>
-        <Button
-            android:id="@+id/buttonAdd"
-            android:layout_width="40dp"
-            android:layout_height="32dp"
-            android:layout_marginRight="5dp"
-            android:text="추가"
-            android:layout_weight="1"
-            android:background="@xml/button_selector"/>
+            android:weightSum="6">
+            <EditText
+                android:id="@+id/editItemText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="추가할 아이템 입력"
+                android:textSize="20dp"
+                android:layout_weight="5"/>
+            <Button
+                android:id="@+id/buttonAdd"
+                android:layout_width="40dp"
+                android:layout_height="32dp"
+                android:layout_marginRight="5dp"
+                android:text="추가"
+                android:layout_weight="1"
+                android:background="@xml/button_selector"/>
+        </LinearLayout>
+
     </LinearLayout>
 </RelativeLayout>

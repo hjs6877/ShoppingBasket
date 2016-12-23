@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class DBController {
     public static final String TAG = "DBController";
     private final String DB_NAME = "db_shopping_basket";
-    private final int DB_VERSION = 1;
+    private final int DB_VERSION = 3;
 
     private Context context;
     private SQLiteDatabase sqLiteDatabase;
@@ -31,6 +31,7 @@ public class DBController {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
+            Log.d("TAG", "### create table");
             db.execSQL(SQLData.SQL_CREATE_TABLE_CART_ITEM);
         }
 
@@ -77,7 +78,9 @@ public class DBController {
                     results.getInt(0),
                     results.getInt(1),
                     results.getInt(2),
-                    results.getString(3)
+                    results.getString(3),
+                    results.getString(4),
+                    results.getString(5)
             );
             cartItemList.add(cartItem);
             results.moveToNext();
