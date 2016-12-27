@@ -1,6 +1,7 @@
 package com.soom.shoppingbasket.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.soom.shoppingbasket.R;
+import com.soom.shoppingbasket.database.DBController;
+import com.soom.shoppingbasket.database.SQLData;
 import com.soom.shoppingbasket.model.CartItem;
 
 import java.util.ArrayList;
@@ -37,13 +40,16 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
     private Map<Integer, CartItem> checkedItemMap;
     private LayoutInflater inflater;
     private Context context;
+    private DBController dbController;
 
-    public CartItemListAdapter(@NonNull Context context, @LayoutRes int resource, @NonNull List<CartItem> cartItemList) {
+    public CartItemListAdapter(@NonNull Context context, @LayoutRes int resource,
+                               @NonNull List<CartItem> cartItemList, DBController dbController) {
         super(context, resource, cartItemList);
         this.context = context;
         inflater = LayoutInflater.from(context);
         this.cartItemList = cartItemList;
         checkedItemMap = new HashMap<>();
+        this.dbController = dbController;
     }
 
     public void addItem(CartItem cartItem){
@@ -132,7 +138,7 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
         viewHolder.itemPurchasedButton.setTag(R.string.isPurchased, isPurchased);
 
         viewHolder.itemCheckBox.setOnCheckedChangeListener(new ItemCheckedChangeListener());
-        viewHolder.itemPurchasedButton.setOnClickListener(new ItemPurchasedButtonClickListener());
+        viewHolder.itemPurchasedButton.setOnClickListener(new ItemPurchasedButtonClickListener(viewHolder));
         return view;
     }
 
@@ -170,21 +176,38 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
      *      - 버튼 색깔을 원래 색으로 변경.
      */
     class ItemPurchasedButtonClickListener implements View.OnClickListener{
+        private ViewHolder viewHolder;
+        int defaultTextColor = 0;
 
+        public ItemPurchasedButtonClickListener(ViewHolder viewHolder){
+            this.viewHolder = viewHolder;
+            defaultTextColor = viewHolder.itemTextView.getTextColors().getDefaultColor();
+        }
+
+        /**
+         * 구매 여부에 따라 구매 상태 변경 및 텍스트 변경.
+         * @param v
+         */
         @Override
         public void onClick(View v) {
+            dbController.openDb();
             Button button = (Button) v;
 
             boolean isPurchased = (boolean) v.getTag(R.string.isPurchased);
             if(isPurchased){
                 button.setTag(R.string.isPurchased, false);
                 button.setText("구매전");
-                // TODO 버튼 색깔.
+                viewHolder.itemTextView.setTextColor(defaultTextColor);
+
+                // TODO DB에 업데이트 하는 부분이 속도가 느리면 쓰레드로 변경 필요.
+                dbController.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, 0);
             }else{
                 button.setTag(R.string.isPurchased, true);
                 button.setText("구매완료");
-                // TODO 버튼 색깔.
+                viewHolder.itemTextView.setTextColor(Color.parseColor("#DCDCDC"));
+                dbController.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, 1);
             }
+            dbController.closeDb();
         }
     }
 }

@@ -61,6 +61,12 @@ public class DBController {
         this.sqLiteDatabase.execSQL(sql, sqlData);
     }
 
+    public void updateIsPurchased(String sql, int isPurchased){
+        Log.d(TAG, "## update isPurchased.");
+        Object[] sqlData = {isPurchased};
+        this.sqLiteDatabase.execSQL(sql, sqlData);
+    }
+
     public void deleteData(String sql, int regId){
         Log.d(TAG, "## delete from cart_item table.");
         Object[] sqlData = new Object[]{regId};

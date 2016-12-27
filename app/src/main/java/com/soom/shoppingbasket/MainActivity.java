@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 리스트뷰에 어댑터 연결.
         itemListView = (ListView) findViewById(R.id.itemListView);
-        adapter = new CartItemListAdapter(this, R.layout.item_layout, cartItemList);
+        adapter = new CartItemListAdapter(this, R.layout.item_layout, cartItemList, dbController);
         itemListView.setAdapter(adapter);
 
         // 아이템 입력을 위한 이벤트 리스너 등록.
