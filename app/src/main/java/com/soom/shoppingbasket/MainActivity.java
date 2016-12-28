@@ -33,9 +33,12 @@ import static java.util.stream.Collectors.toList;
  *      - 테이블에 create_date, update_date 컬럼 추가(ㅇ)
  *      - apk를 지우고 실행을 다시 해본다.(ㅇ)
  *      - SQLite DB 브라우저에서 확인(ㅇ)
- * (3) 아이템 수정
- * (4) 아이템 구매 상태 변경
- * (5) delete 아이콘 표시
+ * (3) 아이템 구매 상태 변경(ㅇ)
+ *      - 버튼 누른 아이템의 상태만 DB에 업데이트 되는지 확인(ㅇ)
+ * (4) 아이템 추가 및 삭제 후, DB에서 데이터 가져와서 어댑터 리스트에 넣은 후에 notifychange 하도록 수정(X)
+ * (4) delete 아이콘 표시(X)
+ * (5) 아이템 수정(X)
+ * (6) 런처 아이콘(X)
  */
 public class MainActivity extends AppCompatActivity {
     private ListView itemListView;
@@ -121,11 +124,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Map<Integer, CartItem> checkedItemMap = adapter.getCheckedItemMap();
-        List<Integer> checkedCartItemList = new ArrayList<>();
+        List<CartItem> checkedCartItemList = new ArrayList<>();
         for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
             CartItem cartItem = map.getValue();
-            int regId = cartItem.getRegId();
-            checkedCartItemList.add(regId);
+            checkedCartItemList.add(cartItem);
         }
 
         switch (item.getItemId()){
@@ -137,13 +139,14 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_item_delete:
                 DBController dbController = new DBController(this);
                 dbController.openDb();
-                for(int regId : checkedCartItemList){
-                    dbController.deleteData(SQLData.SQL_DELETE_ITEM, regId);
+                for(CartItem cartItem : checkedCartItemList){
+                    Toast.makeText(this, "regId: " + cartItem.getRegId() + ", item: " + cartItem.getItemText(), Toast.LENGTH_LONG).show();
+                    dbController.deleteData(SQLData.SQL_DELETE_ITEM, cartItem.getRegId());
                 }
                 dbController.closeDb();
                 adapter.removeItems(checkedCartItemList);
                 adapter.notifyDataSetChanged();
-                Toast.makeText(this, "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "삭제되었습니다.", Toast.LENGTH_SHORT).show();
                 break;
         }
         return super.onOptionsItemSelected(item);

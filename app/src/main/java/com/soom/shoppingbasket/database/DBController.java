@@ -61,9 +61,9 @@ public class DBController {
         this.sqLiteDatabase.execSQL(sql, sqlData);
     }
 
-    public void updateIsPurchased(String sql, int isPurchased){
+    public void updateIsPurchased(String sql, int regId, int isPurchased){
         Log.d(TAG, "## update isPurchased.");
-        Object[] sqlData = {isPurchased};
+        Object[] sqlData = {isPurchased, regId};
         this.sqLiteDatabase.execSQL(sql, sqlData);
     }
 

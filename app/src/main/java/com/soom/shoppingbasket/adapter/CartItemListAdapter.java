@@ -31,6 +31,8 @@ import java.util.Map;
  */
 
 public class CartItemListAdapter extends ArrayAdapter<CartItem> {
+    private final int DEFAULT_ITEM_TEXT_COLOR = Color.parseColor("#000000");
+    private final int CLICKED_ITEM_TEXT_COLOR = Color.parseColor("#DCDCDC");
     class ViewHolder {
         public CheckBox itemCheckBox;
         public TextView itemTextView;
@@ -63,26 +65,26 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
     /**
      * cartItemList에서 선택한 아이템들 제거
      *
-     * @param regIdList
+     * @param checkedCartItemList
      */
-    public void removeItems(List<Integer> regIdList){
+    public void removeItems(List<CartItem> checkedCartItemList){
         boolean doesFinishSearch = false;
         while(!doesFinishSearch){
-            doesFinishSearch = remove(regIdList);
+            doesFinishSearch = remove(checkedCartItemList);
         }
 
     }
 
-    private boolean remove(List<Integer> regIdList){
+    private boolean remove(List<CartItem> checkedCartItemList){
         boolean doesFinishSearch = false;
         boolean doesDeleteItem = false;
         for(int i = 0; i < cartItemList.size(); i++){
             if(i == cartItemList.size()-1) doesFinishSearch = true;
 
-            for(int j = 0; j < regIdList.size(); j++ ){
-                if(cartItemList.get(i).getRegId() == regIdList.get(j)){
+            for(int j = 0; j < checkedCartItemList.size(); j++ ){
+                if(cartItemList.get(i).getRegId() == checkedCartItemList.get(j).getRegId()){
                     cartItemList.remove(i);
-                    regIdList.remove(j);
+                    checkedCartItemList.remove(j);
                     doesDeleteItem = true;
                     break;
                 }
@@ -133,9 +135,16 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
 
         viewHolder.itemCheckBox.setChecked(isChecked);
         viewHolder.itemCheckBox.setTag(cartItem);    // 수정 및 삭제를 위한 아이템을 태그에 저장.
+
         viewHolder.itemTextView.setText(cartItem.getItemText());
+
+        if(isPurchased)
+            viewHolder.itemTextView.setTextColor(CLICKED_ITEM_TEXT_COLOR);
+        else
+            viewHolder.itemTextView.setTextColor(DEFAULT_ITEM_TEXT_COLOR);
         viewHolder.itemPurchasedButton.setText(buttonText);
         viewHolder.itemPurchasedButton.setTag(R.string.isPurchased, isPurchased);
+        viewHolder.itemPurchasedButton.setTag(R.string.regId, cartItem.getRegId());
 
         viewHolder.itemCheckBox.setOnCheckedChangeListener(new ItemCheckedChangeListener());
         viewHolder.itemPurchasedButton.setOnClickListener(new ItemPurchasedButtonClickListener(viewHolder));
@@ -177,11 +186,9 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
      */
     class ItemPurchasedButtonClickListener implements View.OnClickListener{
         private ViewHolder viewHolder;
-        int defaultTextColor = 0;
 
         public ItemPurchasedButtonClickListener(ViewHolder viewHolder){
             this.viewHolder = viewHolder;
-            defaultTextColor = viewHolder.itemTextView.getTextColors().getDefaultColor();
         }
 
         /**
@@ -194,18 +201,20 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
             Button button = (Button) v;
 
             boolean isPurchased = (boolean) v.getTag(R.string.isPurchased);
+            int regId = (int) v.getTag(R.string.regId);
+
             if(isPurchased){
                 button.setTag(R.string.isPurchased, false);
                 button.setText("구매전");
-                viewHolder.itemTextView.setTextColor(defaultTextColor);
+                viewHolder.itemTextView.setTextColor(DEFAULT_ITEM_TEXT_COLOR);
 
                 // TODO DB에 업데이트 하는 부분이 속도가 느리면 쓰레드로 변경 필요.
-                dbController.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, 0);
+                dbController.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, regId, 0);
             }else{
                 button.setTag(R.string.isPurchased, true);
                 button.setText("구매완료");
                 viewHolder.itemTextView.setTextColor(Color.parseColor("#DCDCDC"));
-                dbController.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, 1);
+                dbController.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, regId, 1);
             }
             dbController.closeDb();
         }

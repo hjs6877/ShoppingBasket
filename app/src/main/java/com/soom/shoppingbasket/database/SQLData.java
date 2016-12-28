@@ -21,12 +21,13 @@ public class SQLData {
 
     public static final String SQL_UPDATE_ITEM
             = "UPDATE cart_item " +
-                "SET is_checked=?, is_purchased=?, item=?, update_date=datetime('now')" +
+                "SET is_checked=?, is_purchased=?, item=?, update_date=datetime('now') " +
                 "WHERE reg_id = ?";
 
     public static final String SQL_UPDATE_IS_PURCHASED
             = "UPDATE cart_item " +
-                "SET is_purchased=?, update_date=datetime('now')";
+                "SET is_purchased=?, update_date=datetime('now') " +
+                "WHERE reg_id = ?";
 
 
     public static final String SQL_DELETE_ITEM

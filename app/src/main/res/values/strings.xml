@@ -3,5 +3,6 @@
     <string name="action_settings">Settings</string>
     <string name="action_item_delete">delete</string>
     <string name="isPurchased">isPurchased</string>
+    <string name="regId">regId</string>
     <string name="toast_no_input_item">추가할 아이템을 입력하세요.</string>
 </resources>
