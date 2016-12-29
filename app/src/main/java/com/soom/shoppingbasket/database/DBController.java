@@ -95,4 +95,14 @@ public class DBController {
         return cartItemList;
     }
 
+    public int selectMaxRegId(String sql){
+        Log.d(TAG, "## select max reg_id.");
+        int maxRegId;
+        Cursor results = this.sqLiteDatabase.rawQuery(sql, null);
+        results.moveToFirst();
+        maxRegId = results.getInt(0);
+        results.close();
+        return maxRegId;
+    }
+
 }

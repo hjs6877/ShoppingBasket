@@ -14,15 +14,6 @@ public class CartItem {
     private String createDate;
     private String updateDate;
 
-    public CartItem(int isChecked, int isPurchased, String itemText,
-                    String createDate, String updateDate) {
-        this.isChecked = isChecked;
-        this.isPurchased = isPurchased;
-        this.itemText = itemText;
-        this.createDate = createDate;
-        this.updateDate = updateDate;
-    }
-
     public CartItem(int regId, int isChecked, int isPurchased,
                     String itemText, String createDate, String updateDate) {
         this.regId = regId;
@@ -79,6 +70,7 @@ public class CartItem {
 
     public Object[] getCartItemDataArray(){
         Object[] cartItemData = {
+                this.regId,
                 this.isChecked,
                 this.isPurchased,
                 this.itemText

@@ -54,6 +54,10 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
         this.dbController = dbController;
     }
 
+    public void setCartItemList(List<CartItem> cartItemList) {
+        this.cartItemList = cartItemList;
+    }
+
     public void addItem(CartItem cartItem){
         cartItemList.add(cartItem);
     }
