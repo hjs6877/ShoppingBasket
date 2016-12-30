@@ -66,20 +66,33 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
         return this.checkedItemMap;
     }
 
+    public void clearCheckedItemMap(){
+        this.checkedItemMap.clear();
+    }
+
     /**
      * cartItemList에서 선택한 아이템들 제거
      *
      * @param checkedCartItemList
      */
-    public void removeItems(List<CartItem> checkedCartItemList){
+    public void removeItems(Map<Integer, CartItem> checkedItemMap){
+
         boolean doesFinishSearch = false;
         while(!doesFinishSearch){
-            doesFinishSearch = remove(checkedCartItemList);
+            doesFinishSearch = remove(checkedItemMap);
         }
 
+        this.clearCheckedItemMap();
     }
 
-    private boolean remove(List<CartItem> checkedCartItemList){
+    private boolean remove(Map<Integer, CartItem> checkedItemMap){
+        List<CartItem> checkedCartItemList = new ArrayList<>();
+        for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
+            CartItem cartItem = map.getValue();
+            Log.d("삭제할 아이템 맵(reg_id)", String.valueOf(cartItem.getRegId()));
+            checkedCartItemList.add(cartItem);
+        }
+
         boolean doesFinishSearch = false;
         boolean doesDeleteItem = false;
         for(int i = 0; i < cartItemList.size(); i++){

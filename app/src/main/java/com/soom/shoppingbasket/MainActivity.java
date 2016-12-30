@@ -38,7 +38,7 @@ import static java.util.stream.Collectors.toList;
  *      - 버튼 누른 아이템의 상태만 DB에 업데이트 되는지 확인(ㅇ)
  * (4) 아이템 추가 시, max reg_id를 DB에서 조회한 후, 추가 할 아이템의 reg_id에 max reg_id + 1로 넣어주도록 수정.(ㅇ)
  *      - DB 스키마 수정: reg_id를 auto_increment를 제거(ㅇ)
- * (5) 아이템 2개 추가 후, 멀티 체크로 모두 지우고, 다시 2개 추가 후, 하나만 체크해서 아이템 삭제하면 2개 다 삭제되는 오류(X)
+ * (5) 아이템 2개 추가 후, 멀티 체크로 모두 지우고, 다시 2개 추가 후, 하나만 체크해서 아이템 삭제하면 2개 다 삭제되는 오류(ㅇ)
  * (6) delete 아이콘 표시(X)
  * (7) 아이템 수정(X)
  * (8) 런처 아이콘(X)
@@ -131,11 +131,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Map<Integer, CartItem> checkedItemMap = adapter.getCheckedItemMap();
-        List<CartItem> checkedCartItemList = new ArrayList<>();
-        for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
-            CartItem cartItem = map.getValue();
-            checkedCartItemList.add(cartItem);
-        }
 
         switch (item.getItemId()){
             /**
@@ -146,11 +141,12 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_item_delete:
                 DBController dbController = new DBController(this);
                 dbController.openDb();
-                for(CartItem cartItem : checkedCartItemList){
+                for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
+                    CartItem cartItem = map.getValue();
                     dbController.deleteData(SQLData.SQL_DELETE_ITEM, cartItem.getRegId());
                 }
                 dbController.closeDb();
-                adapter.removeItems(checkedCartItemList);
+                adapter.removeItems(checkedItemMap);
                 adapter.notifyDataSetChanged();
                 Toast.makeText(this, "삭제되었습니다.", Toast.LENGTH_SHORT).show();
                 break;
