@@ -73,7 +73,7 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
     /**
      * cartItemList에서 선택한 아이템들 제거
      *
-     * @param checkedCartItemList
+     * @param checkedItemMap
      */
     public void removeItems(Map<Integer, CartItem> checkedItemMap){
 
