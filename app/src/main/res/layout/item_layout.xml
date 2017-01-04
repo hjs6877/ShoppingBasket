@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="7dp"
-    android:descendantFocusability="blocksDescendants"> <!-- -->
+    android:descendantFocusability="blocksDescendants"> <!-- 아이템 클릭 이벤트를 가능하게 함.-->
     <CheckBox
         android:id="@+id/itemChkbox"
         android:layout_width="wrap_content"

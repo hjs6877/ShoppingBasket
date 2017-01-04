@@ -83,12 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 아이템 long click 시, 아이템 수정을 위한 리스너 등록
         itemListView.setOnItemLongClickListener(new ItemLongClickListener(this));
-        itemListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d("ITEM_CLICK", "##item click!!!");
-            }
-        });
+
     }
 
     @Override

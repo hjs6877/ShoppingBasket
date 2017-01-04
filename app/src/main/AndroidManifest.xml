@@ -16,7 +16,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ItemModifyActivity"
-            android:theme="@android:style/Theme.Dialog"></activity>
+            android:theme="@style/Theme.MyDialog"></activity>
     </application>
 
 </manifest>
