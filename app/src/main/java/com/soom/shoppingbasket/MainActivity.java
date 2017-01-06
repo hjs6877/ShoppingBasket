@@ -47,6 +47,8 @@ import static java.util.stream.Collectors.toList;
  * (8) 런처 아이콘(X)
  */
 public class MainActivity extends AppCompatActivity {
+    public static final int REQUEST_CODE_ITEMMODIFY = 1001;
+
     private ListView itemListView;
     private DBController dbController;
 
@@ -171,9 +173,26 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
             Log.d("ItemLongClickListener", "long click!!");
+            CartItem cartItem = cartItemList.get(position);
+            int regId = cartItem.getRegId();
+            String itemText = cartItem.getItemText();
             Intent intent = new Intent(context, ItemModifyActivity.class);
-            startActivity(intent);
+            intent.putExtra("regId", regId);
+            intent.putExtra("itemText", itemText);
+            intent.putExtra("position", position);
+            startActivityForResult(intent, REQUEST_CODE_ITEMMODIFY);
             return false;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == REQUEST_CODE_ITEMMODIFY){
+            if(resultCode == RESULT_OK){
+//                String modifiedItemText = data
+            }
         }
     }
 }
