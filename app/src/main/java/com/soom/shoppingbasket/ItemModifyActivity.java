@@ -4,15 +4,29 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 
+import com.soom.shoppingbasket.database.DBController;
+import com.soom.shoppingbasket.database.SQLData;
 import com.soom.shoppingbasket.model.CartItem;
 
 public class ItemModifyActivity extends AppCompatActivity {
     private EditText editModifyItemText;
+    private Button buttonModifyItem;
+    private Button buttonCloseModifyItem;
+    private CartItem cartItem;
+    private DBController dbController;
+    private int position;
 
+    public ItemModifyActivity() {
+        dbController = new DBController(this);
+    }
+
+    // TODO 메서드 추출
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -21,20 +35,50 @@ public class ItemModifyActivity extends AppCompatActivity {
         editModifyItemText = (EditText) findViewById(R.id.editModifyItemText);
 
         Intent intent = getIntent();
-        CartItem cartItem = (CartItem) intent.getSerializableExtra("cartItem");
+        cartItem = (CartItem) intent.getSerializableExtra("cartItem");
         String itemText = cartItem.getItemText();
-        int position = intent.getIntExtra("position", 0);
+        position = intent.getIntExtra("position", 0);
 
 
         editModifyItemText.setText(itemText);
         editModifyItemText.setSelection(editModifyItemText.length());
-        /**
-         * TODO
-         * 1. EditText에 수정할 아이템 표시.(ㅇ)
-         * 2. 단순 파라미터가 아닌 객체를 넘겨 받아야 되는걸로 수정 필요(X)
-         * 2. 수정된 아이템을 DB에 업데이트.(X)
-         * 3. 응답 데이터로 수정된 아이템 텍스트와 position을 전송.(X)
-         * 4. MainActivity에서 cartItemList의 cartItem 객체의 아이템 텍스트를 수정 저장 및 NotifyChanged.(X)
-         */
+
+        buttonModifyItem = (Button) findViewById(R.id.buttonModifyItem);
+        buttonModifyItem.setOnClickListener(new ModifyItemTextClickListener());
+
+        buttonCloseModifyItem = (Button) findViewById(R.id.buttonCloseModifyItem);
+        buttonCloseModifyItem.setOnClickListener(new CloseModifyItemClickListener());
+    }
+
+    /**
+     * 아이템 수정 버튼 클릭 리스너
+     */
+    private class ModifyItemTextClickListener implements View.OnClickListener {
+
+        // TODO 메서드 추출
+        @Override
+        public void onClick(View v) {
+            String modifiedItemText = editModifyItemText.getEditableText().toString();
+            cartItem.setItemText(modifiedItemText);
+            dbController.openDb();
+            dbController.updateCartItem(SQLData.SQL_UPDATE_ITEM, cartItem);
+            dbController.closeDb();
+
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("modifiedItemText", modifiedItemText);
+            resultIntent.putExtra("position", position);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+        }
+    }
+
+    /**
+     * 닫기 버튼 클릭 리스너
+     */
+    private class CloseModifyItemClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            finish();
+        }
     }
 }

@@ -1,12 +1,12 @@
 package com.soom.shoppingbasket.model;
 
-import java.util.Date;
+import java.io.Serializable;
 
 /**
  * Created by kjs on 2016-12-08.
  */
 
-public class CartItem {
+public class CartItem implements Serializable {
     private int regId;
     private int isChecked;
     private int isPurchased;

@@ -55,8 +55,8 @@ public class DBController {
         this.sqLiteDatabase.close();
     }
 
-    public void insertData(String sql, CartItem cartItem){
-        Log.d(TAG, "## insert to cart_item table.");
+    public void insertCartItem(String sql, CartItem cartItem){
+        Log.d(TAG, "## insert to cart item.");
         Object[] sqlData = cartItem.getCartItemDataArray();
         this.sqLiteDatabase.execSQL(sql, sqlData);
     }
@@ -64,6 +64,17 @@ public class DBController {
     public void updateIsPurchased(String sql, int regId, int isPurchased){
         Log.d(TAG, "## update isPurchased.");
         Object[] sqlData = {isPurchased, regId};
+        this.sqLiteDatabase.execSQL(sql, sqlData);
+    }
+
+    public void updateCartItem(String sql, CartItem cartItem){
+        Log.d(TAG, "## update cart item.");
+        Object[] sqlData = {
+                cartItem.isChecked(),
+                cartItem.isPurchased(),
+                cartItem.getItemText(),
+                cartItem.getRegId()
+        };
         this.sqLiteDatabase.execSQL(sql, sqlData);
     }
 

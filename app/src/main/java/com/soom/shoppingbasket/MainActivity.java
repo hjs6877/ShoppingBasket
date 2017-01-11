@@ -41,10 +41,18 @@ import static java.util.stream.Collectors.toList;
  * (4) 아이템 추가 시, max reg_id를 DB에서 조회한 후, 추가 할 아이템의 reg_id에 max reg_id + 1로 넣어주도록 수정.(ㅇ)
  *      - DB 스키마 수정: reg_id를 auto_increment를 제거(ㅇ)
  * (5) 아이템 2개 추가 후, 멀티 체크로 모두 지우고, 다시 2개 추가 후, 하나만 체크해서 아이템 삭제하면 2개 다 삭제되는 오류(ㅇ)
- * (6) 아이템 수정(X)
- *      - 수정 팝업 액티비티 오픈 시, 예외 발생.
+ * (6) 아이템 수정(ㅇ)
+ *      - 수정 팝업 액티비티 오픈 시, 예외 발생.(ㅇ)
  * (7) delete 아이콘 표시(X)
  * (8) 런처 아이콘(X)
+ * (9) 어노테이션 라이브러리 적용
+ * (10) DB ORM 적용
+ * (11) 코드 리팩토링
+ *      - MainActivity
+ *      - DBController
+ *      - ItemModifyActivity
+ *      - CartItemListAdapter
+ *      - DB Insert, Update, Delete에 대한 예외 처리.
  */
 public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_ITEMMODIFY = 1001;
@@ -63,16 +71,39 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initActivity();
+
+        cartItemList = getCartItemList();
+
+        InitViews();
+
+    }
+
+
+    /**
+     * 액티비티 초기화 작업
+     */
+    private void initActivity() {
         // 앱바 추가
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // 아이템 조회
         dbController = new DBController(this);
+    }
+
+    /**
+     * 아이템 조회
+     *
+     * @return
+     */
+    private List<CartItem> getCartItemList() {
         dbController.openDb();
         cartItemList = dbController.selectAll(SQLData.SQL_SELECT_ALL_ITEM);
         dbController.closeDb();
+        return cartItemList;
+    }
 
+    private void InitViews() {
         // 리스트뷰에 어댑터 연결.
         itemListView = (ListView) findViewById(R.id.itemListView);
         adapter = new CartItemListAdapter(this, R.layout.item_layout, cartItemList, dbController);
@@ -85,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
 
         // 아이템 long click 시, 아이템 수정을 위한 리스너 등록
         itemListView.setOnItemLongClickListener(new ItemLongClickListener(this));
-
     }
 
     @Override
@@ -105,21 +135,27 @@ public class MainActivity extends AppCompatActivity {
              * - item 갱신
              */
             case R.id.action_item_delete:
-                DBController dbController = new DBController(this);
-                dbController.openDb();
-                for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
-                    CartItem cartItem = map.getValue();
-                    dbController.deleteData(SQLData.SQL_DELETE_ITEM, cartItem.getRegId());
-                }
-                dbController.closeDb();
-                adapter.removeItems(checkedItemMap);
-                adapter.notifyDataSetChanged();
-                Toast.makeText(this, "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                deleteCartItem(checkedItemMap);
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    private void deleteCartItem(Map<Integer, CartItem> checkedItemMap) {
+        dbController.openDb();
+        for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
+            CartItem cartItem = map.getValue();
+            dbController.deleteData(SQLData.SQL_DELETE_ITEM, cartItem.getRegId());
+        }
+        dbController.closeDb();
+        adapter.removeItems(checkedItemMap);
+        adapter.notifyDataSetChanged();
+        Toast.makeText(this, "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * 아이템 추가 버튼 클릭 리스너
+     */
     private class ItemAddClickListener implements View.OnClickListener{
         private Context context;
 
@@ -134,35 +170,45 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override
         public void onClick(View v) {
-            insertItem();
-        }
-
-        private void insertItem() {
             String itemText = editItemText.getEditableText().toString();
             if(itemText.isEmpty()){
                 Toast.makeText(context, R.string.toast_no_input_item, Toast.LENGTH_SHORT).show();
             }else{
-                String currentDate = DateUtil.currentDateToString();
-                // DB에 아이템 추가
-                dbController.openDb();
-                // max reg_id를 조회한다.
-                int maxRegId = dbController.selectMaxRegId(SQLData.SQL_SELECT_MAX_REG_ID);
-
-                int regId = maxRegId + 1;
-                dbController.insertData(SQLData.SQL_INSERT_ITEM, new CartItem(regId, 0, 0, itemText,currentDate, currentDate));
-                dbController.closeDb();
-
-                // 리스트뷰에 아이템 추가 및 갱신
-                cartItemList.add(new CartItem(regId, 0, 0, itemText, currentDate, currentDate));
-                Collections.sort(cartItemList, new CartItemComparator());
-                adapter.notifyDataSetChanged();
-
-                // editText의 텍스트 지워서 초기화.
-                editItemText.setText(null);
+                insertItem(itemText);
+                refreshCartItems();
             }
+
+        }
+
+        private void insertItem(String itemText) {
+            String currentDate = DateUtil.currentDateToString();
+            // DB에 아이템 추가
+            dbController.openDb();
+            // max reg_id를 조회한다.
+            int maxRegId = dbController.selectMaxRegId(SQLData.SQL_SELECT_MAX_REG_ID);
+
+            int regId = maxRegId + 1;
+            dbController.insertCartItem(SQLData.SQL_INSERT_ITEM, new CartItem(regId, 0, 0, itemText,currentDate, currentDate));
+            dbController.closeDb();
+
+
+            // 리스트뷰에 아이템 추가 및 갱신
+            cartItemList.add(new CartItem(regId, 0, 0, itemText, currentDate, currentDate));
+            Collections.sort(cartItemList, new CartItemComparator());
+            adapter.notifyDataSetChanged();
+
+            // editText의 텍스트 지워서 초기화.
+            editItemText.setText(null);
+        }
+
+        // TODO 아이템 갱신에 대해서 insertItem에서 추출
+        private void refreshCartItems() {
         }
     }
 
+    /**
+     * 아이템 Long Click Listener
+     */
     private class ItemLongClickListener implements AdapterView.OnItemLongClickListener {
         private Context context;
 
@@ -174,24 +220,33 @@ public class MainActivity extends AppCompatActivity {
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
             Log.d("ItemLongClickListener", "long click!!");
             CartItem cartItem = cartItemList.get(position);
-            int regId = cartItem.getRegId();
-            String itemText = cartItem.getItemText();
+
             Intent intent = new Intent(context, ItemModifyActivity.class);
-            intent.putExtra("regId", regId);
-            intent.putExtra("itemText", itemText);
+            intent.putExtra("cartItem", cartItem);
             intent.putExtra("position", position);
             startActivityForResult(intent, REQUEST_CODE_ITEMMODIFY);
             return false;
         }
     }
 
+    /**
+     * 활성화 상태의 Activity로부터 응답을 받아 처리.
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == REQUEST_CODE_ITEMMODIFY){
             if(resultCode == RESULT_OK){
-//                String modifiedItemText = data
+                String modifiedItemText = data.getExtras().getString("modifiedItemText");
+                int position = data.getExtras().getInt("position");
+
+                cartItemList.get(position).setItemText(modifiedItemText);
+                adapter.notifyDataSetChanged();
             }
         }
     }
