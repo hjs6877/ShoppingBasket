@@ -48,7 +48,7 @@ import static java.util.stream.Collectors.toList;
  * (9) 어노테이션 라이브러리 적용
  * (10) DB ORM 적용
  * (11) 코드 리팩토링
- *      - MainActivity
+ *      - MainActivity(ㅇ)
  *      - DBController
  *      - ItemModifyActivity
  *      - CartItemListAdapter
@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         initActivity();
 
         cartItemList = getCartItemList();
-
         InitViews();
 
     }
@@ -97,9 +96,7 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     private List<CartItem> getCartItemList() {
-        dbController.openDb();
         cartItemList = dbController.selectAll(SQLData.SQL_SELECT_ALL_ITEM);
-        dbController.closeDb();
         return cartItemList;
     }
 
@@ -174,24 +171,24 @@ public class MainActivity extends AppCompatActivity {
             if(itemText.isEmpty()){
                 Toast.makeText(context, R.string.toast_no_input_item, Toast.LENGTH_SHORT).show();
             }else{
-                insertItem(itemText);
-                refreshCartItems();
+                String currentDate = DateUtil.currentDateToString();
+
+                // max reg_id를 조회한다.
+                int maxRegId = dbController.selectMaxRegId(SQLData.SQL_SELECT_MAX_REG_ID);
+                int regId = maxRegId + 1;
+
+                insertItem(regId, itemText, currentDate);
+                refreshCartItems(regId, itemText, currentDate);
             }
 
         }
 
-        private void insertItem(String itemText) {
-            String currentDate = DateUtil.currentDateToString();
+        private void insertItem(int regId, String itemText, String currentDate) {
             // DB에 아이템 추가
-            dbController.openDb();
-            // max reg_id를 조회한다.
-            int maxRegId = dbController.selectMaxRegId(SQLData.SQL_SELECT_MAX_REG_ID);
-
-            int regId = maxRegId + 1;
             dbController.insertCartItem(SQLData.SQL_INSERT_ITEM, new CartItem(regId, 0, 0, itemText,currentDate, currentDate));
-            dbController.closeDb();
+        }
 
-
+        private void refreshCartItems(int regId, String itemText, String currentDate) {
             // 리스트뷰에 아이템 추가 및 갱신
             cartItemList.add(new CartItem(regId, 0, 0, itemText, currentDate, currentDate));
             Collections.sort(cartItemList, new CartItemComparator());
@@ -199,10 +196,6 @@ public class MainActivity extends AppCompatActivity {
 
             // editText의 텍스트 지워서 초기화.
             editItemText.setText(null);
-        }
-
-        // TODO 아이템 갱신에 대해서 insertItem에서 추출
-        private void refreshCartItems() {
         }
     }
 

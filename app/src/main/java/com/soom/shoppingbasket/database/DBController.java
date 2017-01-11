@@ -52,19 +52,24 @@ public class DBController {
     }
 
     public void closeDb(){
+        Log.d(TAG, "## DB closed.");
         this.sqLiteDatabase.close();
     }
 
     public void insertCartItem(String sql, CartItem cartItem){
         Log.d(TAG, "## insert to cart item.");
         Object[] sqlData = cartItem.getCartItemDataArray();
+        this.openDb();
         this.sqLiteDatabase.execSQL(sql, sqlData);
+        this.closeDb();
     }
 
     public void updateIsPurchased(String sql, int regId, int isPurchased){
         Log.d(TAG, "## update isPurchased.");
         Object[] sqlData = {isPurchased, regId};
+        this.openDb();
         this.sqLiteDatabase.execSQL(sql, sqlData);
+        this.closeDb();
     }
 
     public void updateCartItem(String sql, CartItem cartItem){
@@ -75,16 +80,21 @@ public class DBController {
                 cartItem.getItemText(),
                 cartItem.getRegId()
         };
+        this.openDb();
         this.sqLiteDatabase.execSQL(sql, sqlData);
+        this.closeDb();
     }
 
     public void deleteData(String sql, int regId){
         Log.d(TAG, "## delete from cart_item table.");
         Object[] sqlData = new Object[]{regId};
+        this.openDb();
         this.sqLiteDatabase.execSQL(sql, sqlData);
+        this.closeDb();
     }
 
     public ArrayList<CartItem> selectAll(String sql){
+        this.openDb();
         Log.d(TAG, "## cart_item table select.");
         ArrayList<CartItem> cartItemList = new ArrayList<>();
         Cursor results = this.sqLiteDatabase.rawQuery(sql, null);
@@ -103,16 +113,19 @@ public class DBController {
             results.moveToNext();
         }
         results.close();
+        this.closeDb();
         return cartItemList;
     }
 
     public int selectMaxRegId(String sql){
+        this.openDb();
         Log.d(TAG, "## select max reg_id.");
         int maxRegId;
         Cursor results = this.sqLiteDatabase.rawQuery(sql, null);
         results.moveToFirst();
         maxRegId = results.getInt(0);
         results.close();
+        this.closeDb();
         return maxRegId;
     }
 
