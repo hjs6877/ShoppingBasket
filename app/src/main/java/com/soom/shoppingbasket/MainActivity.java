@@ -20,6 +20,7 @@ import com.soom.shoppingbasket.comparator.CartItemComparator;
 import com.soom.shoppingbasket.database.DBController;
 import com.soom.shoppingbasket.database.SQLData;
 import com.soom.shoppingbasket.model.CartItem;
+import com.soom.shoppingbasket.service.CartItemService;
 import com.soom.shoppingbasket.utils.DateUtil;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ import static java.util.stream.Collectors.toList;
  * (10) DB ORM 적용
  * (11) 코드 리팩토링
  *      - MainActivity(ㅇ)
- *      - DBController
+ *      - DBController(ㅇ)
  *      - ItemModifyActivity
  *      - CartItemListAdapter
  *      - DB Insert, Update, Delete에 대한 예외 처리.
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView itemListView;
     private DBController dbController;
+    private CartItemService cartItemService;
 
     private Button buttonAdd;
     private EditText editItemText;
@@ -88,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         dbController = new DBController(this);
+        cartItemService = new CartItemService(dbController);
     }
 
     /**
@@ -96,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     private List<CartItem> getCartItemList() {
-        cartItemList = dbController.selectAll(SQLData.SQL_SELECT_ALL_ITEM);
+        cartItemList = cartItemService.selectAll(SQLData.SQL_SELECT_ALL_ITEM);
         return cartItemList;
     }
 
@@ -142,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         dbController.openDb();
         for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
             CartItem cartItem = map.getValue();
-            dbController.deleteData(SQLData.SQL_DELETE_ITEM, cartItem.getRegId());
+            cartItemService.deleteData(SQLData.SQL_DELETE_ITEM, cartItem.getRegId());
         }
         dbController.closeDb();
         adapter.removeItems(checkedItemMap);
@@ -174,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                 String currentDate = DateUtil.currentDateToString();
 
                 // max reg_id를 조회한다.
-                int maxRegId = dbController.selectMaxRegId(SQLData.SQL_SELECT_MAX_REG_ID);
+                int maxRegId = cartItemService.selectMaxRegId(SQLData.SQL_SELECT_MAX_REG_ID);
                 int regId = maxRegId + 1;
 
                 insertItem(regId, itemText, currentDate);
@@ -185,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
 
         private void insertItem(int regId, String itemText, String currentDate) {
             // DB에 아이템 추가
-            dbController.insertCartItem(SQLData.SQL_INSERT_ITEM, new CartItem(regId, 0, 0, itemText,currentDate, currentDate));
+            cartItemService.insertCartItem(SQLData.SQL_INSERT_ITEM, new CartItem(regId, 0, 0, itemText,currentDate, currentDate));
         }
 
         private void refreshCartItems(int regId, String itemText, String currentDate) {

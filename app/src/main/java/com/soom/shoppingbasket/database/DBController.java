@@ -11,7 +11,7 @@ import com.soom.shoppingbasket.model.CartItem;
 import java.util.ArrayList;
 
 /**
- * Created by kjs on 2016-12-13.
+ * SQLite Database 컨트롤러
  */
 
 public class DBController {
@@ -56,77 +56,7 @@ public class DBController {
         this.sqLiteDatabase.close();
     }
 
-    public void insertCartItem(String sql, CartItem cartItem){
-        Log.d(TAG, "## insert to cart item.");
-        Object[] sqlData = cartItem.getCartItemDataArray();
-        this.openDb();
-        this.sqLiteDatabase.execSQL(sql, sqlData);
-        this.closeDb();
+    public SQLiteDatabase getSqLiteDatabase() {
+        return sqLiteDatabase;
     }
-
-    public void updateIsPurchased(String sql, int regId, int isPurchased){
-        Log.d(TAG, "## update isPurchased.");
-        Object[] sqlData = {isPurchased, regId};
-        this.openDb();
-        this.sqLiteDatabase.execSQL(sql, sqlData);
-        this.closeDb();
-    }
-
-    public void updateCartItem(String sql, CartItem cartItem){
-        Log.d(TAG, "## update cart item.");
-        Object[] sqlData = {
-                cartItem.isChecked(),
-                cartItem.isPurchased(),
-                cartItem.getItemText(),
-                cartItem.getRegId()
-        };
-        this.openDb();
-        this.sqLiteDatabase.execSQL(sql, sqlData);
-        this.closeDb();
-    }
-
-    public void deleteData(String sql, int regId){
-        Log.d(TAG, "## delete from cart_item table.");
-        Object[] sqlData = new Object[]{regId};
-        this.openDb();
-        this.sqLiteDatabase.execSQL(sql, sqlData);
-        this.closeDb();
-    }
-
-    public ArrayList<CartItem> selectAll(String sql){
-        this.openDb();
-        Log.d(TAG, "## cart_item table select.");
-        ArrayList<CartItem> cartItemList = new ArrayList<>();
-        Cursor results = this.sqLiteDatabase.rawQuery(sql, null);
-        results.moveToFirst();
-
-        while(!results.isAfterLast()){
-            CartItem cartItem = new CartItem(
-                    results.getInt(0),
-                    results.getInt(1),
-                    results.getInt(2),
-                    results.getString(3),
-                    results.getString(4),
-                    results.getString(5)
-            );
-            cartItemList.add(cartItem);
-            results.moveToNext();
-        }
-        results.close();
-        this.closeDb();
-        return cartItemList;
-    }
-
-    public int selectMaxRegId(String sql){
-        this.openDb();
-        Log.d(TAG, "## select max reg_id.");
-        int maxRegId;
-        Cursor results = this.sqLiteDatabase.rawQuery(sql, null);
-        results.moveToFirst();
-        maxRegId = results.getInt(0);
-        results.close();
-        this.closeDb();
-        return maxRegId;
-    }
-
 }

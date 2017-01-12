@@ -13,6 +13,7 @@ import android.widget.EditText;
 import com.soom.shoppingbasket.database.DBController;
 import com.soom.shoppingbasket.database.SQLData;
 import com.soom.shoppingbasket.model.CartItem;
+import com.soom.shoppingbasket.service.CartItemService;
 
 public class ItemModifyActivity extends AppCompatActivity {
     private EditText editModifyItemText;
@@ -20,10 +21,13 @@ public class ItemModifyActivity extends AppCompatActivity {
     private Button buttonCloseModifyItem;
     private CartItem cartItem;
     private DBController dbController;
+    private CartItemService cartItemService;
+
     private int position;
 
     public ItemModifyActivity() {
         dbController = new DBController(this);
+        cartItemService = new CartItemService(dbController);
     }
 
     // TODO 메서드 추출
@@ -60,9 +64,7 @@ public class ItemModifyActivity extends AppCompatActivity {
         public void onClick(View v) {
             String modifiedItemText = editModifyItemText.getEditableText().toString();
             cartItem.setItemText(modifiedItemText);
-            dbController.openDb();
-            dbController.updateCartItem(SQLData.SQL_UPDATE_ITEM, cartItem);
-            dbController.closeDb();
+            cartItemService.updateCartItem(SQLData.SQL_UPDATE_ITEM, cartItem);
 
             Intent resultIntent = new Intent();
             resultIntent.putExtra("modifiedItemText", modifiedItemText);

@@ -20,6 +20,7 @@ import com.soom.shoppingbasket.R;
 import com.soom.shoppingbasket.database.DBController;
 import com.soom.shoppingbasket.database.SQLData;
 import com.soom.shoppingbasket.model.CartItem;
+import com.soom.shoppingbasket.service.CartItemService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +44,7 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
     private LayoutInflater inflater;
     private Context context;
     private DBController dbController;
+    private CartItemService cartItemService;
 
     public CartItemListAdapter(@NonNull Context context, @LayoutRes int resource,
                                @NonNull List<CartItem> cartItemList, DBController dbController) {
@@ -52,6 +54,7 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
         this.cartItemList = cartItemList;
         checkedItemMap = new HashMap<>();
         this.dbController = dbController;
+        cartItemService = new CartItemService(dbController);
     }
 
     public void setCartItemList(List<CartItem> cartItemList) {
@@ -226,12 +229,12 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
                 viewHolder.itemTextView.setTextColor(DEFAULT_ITEM_TEXT_COLOR);
 
                 // TODO DB에 업데이트 하는 부분이 속도가 느리면 쓰레드로 변경 필요.
-                dbController.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, regId, 0);
+                cartItemService.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, regId, 0);
             }else{
                 button.setTag(R.string.isPurchased, true);
                 button.setText("구매완료");
                 viewHolder.itemTextView.setTextColor(Color.parseColor("#DCDCDC"));
-                dbController.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, regId, 1);
+                cartItemService.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, regId, 1);
             }
             dbController.closeDb();
         }
