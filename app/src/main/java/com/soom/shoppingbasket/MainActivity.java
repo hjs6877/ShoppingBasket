@@ -51,7 +51,7 @@ import static java.util.stream.Collectors.toList;
  * (11) 코드 리팩토링
  *      - MainActivity(ㅇ)
  *      - DBController(ㅇ)
- *      - ItemModifyActivity
+ *      - ItemModifyActivity(ㅇ)
  *      - CartItemListAdapter
  *      - DB Insert, Update, Delete에 대한 예외 처리.
  */
@@ -68,15 +68,17 @@ public class MainActivity extends AppCompatActivity {
     private List<CartItem> cartItemList;
     private CartItemListAdapter adapter;
 
+    public MainActivity(){
+        dbController = new DBController(this);
+        cartItemService = new CartItemService(dbController);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         initActivity();
-
-        cartItemList = getCartItemList();
-        InitViews();
+        initViews();
 
     }
 
@@ -88,22 +90,14 @@ public class MainActivity extends AppCompatActivity {
         // 앱바 추가
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        dbController = new DBController(this);
-        cartItemService = new CartItemService(dbController);
     }
 
     /**
-     * 아이템 조회
-     *
-     * @return
+     * 화면에 표시되는 뷰에 대한 초기화 작업을 진행한다.
      */
-    private List<CartItem> getCartItemList() {
-        cartItemList = cartItemService.selectAll(SQLData.SQL_SELECT_ALL_ITEM);
-        return cartItemList;
-    }
+    private void initViews() {
+        cartItemList = getCartItemList();
 
-    private void InitViews() {
         // 리스트뷰에 어댑터 연결.
         itemListView = (ListView) findViewById(R.id.itemListView);
         adapter = new CartItemListAdapter(this, R.layout.item_layout, cartItemList, dbController);
@@ -116,6 +110,16 @@ public class MainActivity extends AppCompatActivity {
 
         // 아이템 long click 시, 아이템 수정을 위한 리스너 등록
         itemListView.setOnItemLongClickListener(new ItemLongClickListener(this));
+    }
+
+    /**
+     * 아이템 조회
+     *
+     * @return
+     */
+    private List<CartItem> getCartItemList() {
+        cartItemList = cartItemService.selectAll(SQLData.SQL_SELECT_ALL_ITEM);
+        return cartItemList;
     }
 
     @Override
@@ -142,12 +146,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void deleteCartItem(Map<Integer, CartItem> checkedItemMap) {
-        dbController.openDb();
         for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
             CartItem cartItem = map.getValue();
             cartItemService.deleteData(SQLData.SQL_DELETE_ITEM, cartItem.getRegId());
         }
-        dbController.closeDb();
         adapter.removeItems(checkedItemMap);
         adapter.notifyDataSetChanged();
         Toast.makeText(this, "삭제되었습니다.", Toast.LENGTH_SHORT).show();
