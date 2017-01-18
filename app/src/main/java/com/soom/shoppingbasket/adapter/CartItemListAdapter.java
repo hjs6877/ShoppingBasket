@@ -22,22 +22,26 @@ import com.soom.shoppingbasket.database.SQLData;
 import com.soom.shoppingbasket.model.CartItem;
 import com.soom.shoppingbasket.service.CartItemService;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by kjs on 2016-12-08.
+ * 아이템 데이터를 리스트뷰에 제공해주는 어댑터 클래스
  */
 
 public class CartItemListAdapter extends ArrayAdapter<CartItem> {
     private final int DEFAULT_ITEM_TEXT_COLOR = Color.parseColor("#000000");
     private final int CLICKED_ITEM_TEXT_COLOR = Color.parseColor("#DCDCDC");
-    class ViewHolder {
-        public CheckBox itemCheckBox;
-        public TextView itemTextView;
-        public Button itemPurchasedButton;
+    private class ViewHolder {
+        CheckBox itemCheckBox;
+        TextView itemTextView;
+        Button itemPurchasedButton;
     }
     private List<CartItem> cartItemList;
     private Map<Integer, CartItem> checkedItemMap;
@@ -89,6 +93,7 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
     }
 
     private boolean remove(Map<Integer, CartItem> checkedItemMap){
+
         List<CartItem> checkedCartItemList = new ArrayList<>();
         for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
             CartItem cartItem = map.getValue();
@@ -96,6 +101,9 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
             checkedCartItemList.add(cartItem);
         }
 
+        // TODO
+//        Collection<CartItem> removedCartItemList = CollectionUtils.removeAll(cartItemList, checkedCartItemList);
+//        this.cartItemList = (List<CartItem>) removedCartItemList;
         boolean doesFinishSearch = false;
         boolean doesDeleteItem = false;
         for(int i = 0; i < cartItemList.size(); i++){
@@ -134,7 +142,7 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view = convertView;
-        ViewHolder viewHolder = null;
+        ViewHolder viewHolder;
 
         if(view == null){
             viewHolder = new ViewHolder();

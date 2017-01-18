@@ -53,6 +53,8 @@ import static java.util.stream.Collectors.toList;
  *      - DBController(ㅇ)
  *      - ItemModifyActivity(ㅇ)
  *      - CartItemListAdapter
+ *          ㄴ CollectionUtils를 이용하여 체크 된 리스트를 CartItemList에서 제거하는 작업
+ *          ㄴ getCartItemList()를 추가하고, cartItemList 사용 시, 해당 메서드 사용하도록 수정.
  *      - DB Insert, Update, Delete에 대한 예외 처리.
  */
 public class MainActivity extends AppCompatActivity {
@@ -195,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
 
         private void refreshCartItems(int regId, String itemText, String currentDate) {
             // 리스트뷰에 아이템 추가 및 갱신
-            cartItemList.add(new CartItem(regId, 0, 0, itemText, currentDate, currentDate));
+            adapter.addItem(new CartItem(regId, 0, 0, itemText, currentDate, currentDate));
             Collections.sort(cartItemList, new CartItemComparator());
             adapter.notifyDataSetChanged();
 
