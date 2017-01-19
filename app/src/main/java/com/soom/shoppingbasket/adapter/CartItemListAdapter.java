@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -35,9 +36,13 @@ import java.util.Map;
  * 아이템 데이터를 리스트뷰에 제공해주는 어댑터 클래스
  */
 
-public class CartItemListAdapter extends ArrayAdapter<CartItem> {
+public class CartItemListAdapter extends BaseAdapter {
     private final int DEFAULT_ITEM_TEXT_COLOR = Color.parseColor("#000000");
     private final int CLICKED_ITEM_TEXT_COLOR = Color.parseColor("#DCDCDC");
+
+    /**
+     * 리스트 뷰에 아이템으로 표시되는 위젯 객체들을 보관하는 내부 클래스
+     */
     private class ViewHolder {
         CheckBox itemCheckBox;
         TextView itemTextView;
@@ -50,9 +55,7 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
     private DBController dbController;
     private CartItemService cartItemService;
 
-    public CartItemListAdapter(@NonNull Context context, @LayoutRes int resource,
-                               @NonNull List<CartItem> cartItemList, DBController dbController) {
-        super(context, resource, cartItemList);
+    public CartItemListAdapter(Context context, List<CartItem> cartItemList, DBController dbController) {
         this.context = context;
         inflater = LayoutInflater.from(context);
         this.cartItemList = cartItemList;
@@ -63,6 +66,10 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
 
     public void setCartItemList(List<CartItem> cartItemList) {
         this.cartItemList = cartItemList;
+    }
+
+    public List<CartItem> getCartItemList(){
+        return cartItemList;
     }
 
     public void addItem(CartItem cartItem){
@@ -83,59 +90,31 @@ public class CartItemListAdapter extends ArrayAdapter<CartItem> {
      * @param checkedItemMap
      */
     public void removeItems(Map<Integer, CartItem> checkedItemMap){
-
-        boolean doesFinishSearch = false;
-        while(!doesFinishSearch){
-            doesFinishSearch = remove(checkedItemMap);
-        }
-
-        this.clearCheckedItemMap();
-    }
-
-    private boolean remove(Map<Integer, CartItem> checkedItemMap){
-
         List<CartItem> checkedCartItemList = new ArrayList<>();
         for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
             CartItem cartItem = map.getValue();
             Log.d("삭제할 아이템 맵(reg_id)", String.valueOf(cartItem.getRegId()));
             checkedCartItemList.add(cartItem);
         }
-
-        // TODO
-//        Collection<CartItem> removedCartItemList = CollectionUtils.removeAll(cartItemList, checkedCartItemList);
-//        this.cartItemList = (List<CartItem>) removedCartItemList;
-        boolean doesFinishSearch = false;
-        boolean doesDeleteItem = false;
-        for(int i = 0; i < cartItemList.size(); i++){
-            if(i == cartItemList.size()-1) doesFinishSearch = true;
-
-            for(int j = 0; j < checkedCartItemList.size(); j++ ){
-                if(cartItemList.get(i).getRegId() == checkedCartItemList.get(j).getRegId()){
-                    cartItemList.remove(i);
-                    checkedCartItemList.remove(j);
-                    doesDeleteItem = true;
-                    break;
-                }
-            }
-            if(doesDeleteItem) break;
-        }
-        return doesFinishSearch;
+        Collection<CartItem> removedCartItemList = CollectionUtils.removeAll(cartItemList, checkedCartItemList);
+        setCartItemList((List<CartItem>) removedCartItemList);
+        this.clearCheckedItemMap();
     }
 
     @Override
     public int getCount() {
-        return super.getCount();
+        return cartItemList.size();
     }
 
     @Nullable
     @Override
     public CartItem getItem(int position) {
-        return super.getItem(position);
+        return cartItemList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return super.getItemId(position);
+        return position;
     }
 
     @NonNull

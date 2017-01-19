@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonAdd;
     private EditText editItemText;
 
-    private List<CartItem> cartItemList;
+
     private CartItemListAdapter adapter;
 
     public MainActivity(){
@@ -98,11 +98,11 @@ public class MainActivity extends AppCompatActivity {
      * 화면에 표시되는 뷰에 대한 초기화 작업을 진행한다.
      */
     private void initViews() {
-        cartItemList = getCartItemList();
+        List<CartItem> cartItemList = getCartItemList();
 
         // 리스트뷰에 어댑터 연결.
         itemListView = (ListView) findViewById(R.id.itemListView);
-        adapter = new CartItemListAdapter(this, R.layout.item_layout, cartItemList, dbController);
+        adapter = new CartItemListAdapter(this, cartItemList, dbController);
         itemListView.setAdapter(adapter);
 
         // 아이템 입력을 위한 이벤트 리스너 등록.
@@ -120,8 +120,7 @@ public class MainActivity extends AppCompatActivity {
      * @return
      */
     private List<CartItem> getCartItemList() {
-        cartItemList = cartItemService.selectAll(SQLData.SQL_SELECT_ALL_ITEM);
-        return cartItemList;
+        return cartItemService.selectAll(SQLData.SQL_SELECT_ALL_ITEM);
     }
 
     @Override
@@ -198,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
         private void refreshCartItems(int regId, String itemText, String currentDate) {
             // 리스트뷰에 아이템 추가 및 갱신
             adapter.addItem(new CartItem(regId, 0, 0, itemText, currentDate, currentDate));
-            Collections.sort(cartItemList, new CartItemComparator());
+            Collections.sort(adapter.getCartItemList(), new CartItemComparator());
             adapter.notifyDataSetChanged();
 
             // editText의 텍스트 지워서 초기화.
@@ -219,7 +218,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
             Log.d("ItemLongClickListener", "long click!!");
-            CartItem cartItem = cartItemList.get(position);
+            CartItem cartItem = adapter.getCartItemList().get(position);
 
             Intent intent = new Intent(context, ItemModifyActivity.class);
             intent.putExtra("cartItem", cartItem);
@@ -245,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
                 String modifiedItemText = data.getExtras().getString("modifiedItemText");
                 int position = data.getExtras().getInt("position");
 
-                cartItemList.get(position).setItemText(modifiedItemText);
+                adapter.getCartItemList().get(position).setItemText(modifiedItemText);
                 adapter.notifyDataSetChanged();
             }
         }
