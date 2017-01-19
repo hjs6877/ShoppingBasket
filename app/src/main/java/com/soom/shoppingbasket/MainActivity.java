@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
             cartItemService.deleteData(SQLData.SQL_DELETE_ITEM, cartItem.getRegId());
         }
         adapter.removeItems(checkedItemMap);
-        adapter.notifyDataSetChanged();
         Toast.makeText(this, "삭제되었습니다.", Toast.LENGTH_SHORT).show();
     }
 
