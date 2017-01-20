@@ -22,6 +22,7 @@ import com.soom.shoppingbasket.database.DBController;
 import com.soom.shoppingbasket.database.SQLData;
 import com.soom.shoppingbasket.model.CartItem;
 import com.soom.shoppingbasket.service.CartItemService;
+import com.soom.shoppingbasket.utils.DataTypeUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -51,12 +52,10 @@ public class CartItemListAdapter extends BaseAdapter {
     private List<CartItem> cartItemList;
     private Map<Integer, CartItem> checkedItemMap;
     private LayoutInflater inflater;
-    private Context context;
     private DBController dbController;
     private CartItemService cartItemService;
 
     public CartItemListAdapter(Context context, List<CartItem> cartItemList, DBController dbController) {
-        this.context = context;
         inflater = LayoutInflater.from(context);
         this.cartItemList = cartItemList;
         checkedItemMap = new HashMap<>();
@@ -72,14 +71,26 @@ public class CartItemListAdapter extends BaseAdapter {
         return cartItemList;
     }
 
+    /**
+     * 아이템 추가
+     * @param cartItem
+     */
     public void addItem(CartItem cartItem){
         cartItemList.add(cartItem);
     }
 
+    /**
+     * 체크박스 선택 체크된 아이템 맵을 반환.
+     *
+     * @return
+     */
     public Map<Integer, CartItem> getCheckedItemMap(){
         return this.checkedItemMap;
     }
 
+    /**
+     * 체크된 아이템 맵을 비운다.
+     */
     public void clearCheckedItemMap(){
         this.checkedItemMap.clear();
     }
@@ -90,13 +101,26 @@ public class CartItemListAdapter extends BaseAdapter {
      * @param checkedItemMap
      */
     public void removeItems(Map<Integer, CartItem> checkedItemMap){
-        List<CartItem> checkedCartItemList = new ArrayList<>(checkedItemMap.values());
-        Collection<CartItem> removedCartItemList = CollectionUtils.removeAll(cartItemList, checkedCartItemList);
-        setCartItemList((List<CartItem>) removedCartItemList);      // 삭제되고 남은 아이템으로 재할당.
+        subtractCheckedCartItem(checkedItemMap);
+
         notifyDataSetChanged();
         this.clearCheckedItemMap();                                 // 체크 된 아이템들을 제거.
     }
 
+    /**
+     * 전체 아이템 목록에서 체크된 아이템을 제거한다.
+     * @param checkedItemMap
+     */
+    private void subtractCheckedCartItem(Map<Integer, CartItem> checkedItemMap) {
+        List<CartItem> checkedCartItemList = new ArrayList<>(checkedItemMap.values());
+        Collection<CartItem> removedCartItemList = CollectionUtils.removeAll(cartItemList, checkedCartItemList);
+        setCartItemList((List<CartItem>) removedCartItemList);      // 삭제되고 남은 아이템으로 재할당.
+    }
+
+    /**
+     * 아이템의 갯수 반환. 반환 된 수만큼 실제 리스트뷰에 아이템이 표시 됨.
+     * @return
+     */
     @Override
     public int getCount() {
         return cartItemList.size();
@@ -113,6 +137,13 @@ public class CartItemListAdapter extends BaseAdapter {
         return position;
     }
 
+    /**
+     * 리스트뷰에 표시 될 뷰그룹(아이템 포함)을 생성. 아이템의 갯수만큼 내부적으로 반복 호출 됨.
+     * @param position
+     * @param convertView
+     * @param parent
+     * @return
+     */
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -120,8 +151,10 @@ public class CartItemListAdapter extends BaseAdapter {
         ViewHolder viewHolder;
 
         if(view == null){
-            viewHolder = new ViewHolder();
+            // 아이템 뷰 inflation.
             view = inflater.inflate(R.layout.item_layout, null);
+
+            viewHolder = new ViewHolder();
             viewHolder.itemCheckBox = (CheckBox) view.findViewById(R.id.itemChkbox);
             viewHolder.itemTextView = (TextView) view.findViewById(R.id.itemText);
             viewHolder.itemPurchasedButton = (Button) view.findViewById(R.id.itemPurchasedButton);
@@ -131,27 +164,60 @@ public class CartItemListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) view.getTag();
         }
 
+        setWidget(viewHolder, position);
+
+        return view;
+    }
+
+    /**
+     * 리스트 뷰에 그려질 아이템 위젯들을 셋팅한다.
+     * @param viewHolder
+     * @param position
+     */
+    private void setWidget(ViewHolder viewHolder, int position) {
         CartItem cartItem = getItem(position);
-        boolean isChecked = cartItem.isChecked() == 1 ? true : false;
-        boolean isPurchased = cartItem.isPurchased() == 1 ? true : false;
-        String buttonText = cartItem.isPurchased() == 1 ? "구매완료" : "구매전";
 
-        viewHolder.itemCheckBox.setChecked(isChecked);
-        viewHolder.itemCheckBox.setTag(cartItem);    // 수정 및 삭제를 위한 아이템을 태그에 저장.
+        setItemCheckBox(viewHolder, cartItem);
+        setItemTextView(viewHolder, cartItem);
+        setItemPurchasedButton(viewHolder, cartItem);
 
+    }
+
+    private void setItemPurchasedButton(ViewHolder viewHolder, CartItem cartItem) {
+        String buttonText = getButtonText(cartItem); // TODO DB에서 가져올 때 포함 시키도록 수정 필요.
+        viewHolder.itemPurchasedButton.setText(buttonText);
+        viewHolder.itemPurchasedButton.setTag(R.string.isPurchased, isPurchased(cartItem));
+        viewHolder.itemPurchasedButton.setTag(R.string.regId, cartItem.getRegId());
+
+        viewHolder.itemPurchasedButton.setOnClickListener(new ItemPurchasedButtonClickListener(viewHolder));
+    }
+
+    private void setItemTextView(ViewHolder viewHolder, CartItem cartItem) {
         viewHolder.itemTextView.setText(cartItem.getItemText());
 
-        if(isPurchased)
+        if(isPurchased(cartItem))
             viewHolder.itemTextView.setTextColor(CLICKED_ITEM_TEXT_COLOR);
         else
             viewHolder.itemTextView.setTextColor(DEFAULT_ITEM_TEXT_COLOR);
-        viewHolder.itemPurchasedButton.setText(buttonText);
-        viewHolder.itemPurchasedButton.setTag(R.string.isPurchased, isPurchased);
-        viewHolder.itemPurchasedButton.setTag(R.string.regId, cartItem.getRegId());
+    }
+
+    private void setItemCheckBox(ViewHolder viewHolder, CartItem cartItem) {
+        viewHolder.itemCheckBox.setChecked(isChecked(cartItem));
+        viewHolder.itemCheckBox.setTag(cartItem);    // 수정 및 삭제를 위한 아이템을 태그에 저장.
 
         viewHolder.itemCheckBox.setOnCheckedChangeListener(new ItemCheckedChangeListener());
-        viewHolder.itemPurchasedButton.setOnClickListener(new ItemPurchasedButtonClickListener(viewHolder));
-        return view;
+    }
+
+    private String getButtonText(CartItem cartItem) {
+        return cartItem.isPurchased() == 1 ? "구매완료" : "구매전";
+    }
+
+    private boolean isChecked(CartItem cartItem) {
+        return cartItem.isChecked() == 1 ? true : false;
+    }
+
+    private boolean isPurchased(CartItem cartItem) {
+        return cartItem.isPurchased() == 1 ? true : false;
     }
 
     /**
@@ -168,11 +234,10 @@ public class CartItemListAdapter extends BaseAdapter {
             /**
              * checked 아이템을 컬렉션에 담고, unchecked 아이템은 컬렉션에서 제거한다.
              */
-            if(isChecked){
+            if(isChecked)
                 checkedItemMap.put(regId, cartItem);
-            }else{
+            else
                 checkedItemMap.remove(regId);
-            }
         }
     }
 
@@ -200,26 +265,30 @@ public class CartItemListAdapter extends BaseAdapter {
          */
         @Override
         public void onClick(View v) {
-            dbController.openDb();
             Button button = (Button) v;
 
             boolean isPurchased = (boolean) v.getTag(R.string.isPurchased);
             int regId = (int) v.getTag(R.string.regId);
+            boolean purchasedStauts;
+            String buttonText;
+            int buttonColor;
 
             if(isPurchased){
-                button.setTag(R.string.isPurchased, false);
-                button.setText("구매전");
-                viewHolder.itemTextView.setTextColor(DEFAULT_ITEM_TEXT_COLOR);
-
-                // TODO DB에 업데이트 하는 부분이 속도가 느리면 쓰레드로 변경 필요.
-                cartItemService.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, regId, 0);
+                purchasedStauts = false;
+                buttonText = "구매전";
+                buttonColor = DEFAULT_ITEM_TEXT_COLOR;
             }else{
-                button.setTag(R.string.isPurchased, true);
-                button.setText("구매완료");
-                viewHolder.itemTextView.setTextColor(Color.parseColor("#DCDCDC"));
-                cartItemService.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, regId, 1);
+                purchasedStauts = true;
+                buttonText = "구매완료";
+                buttonColor = Color.parseColor("#DCDCDC");
             }
-            dbController.closeDb();
+
+            button.setTag(R.string.isPurchased, purchasedStauts);
+            button.setText(buttonText);
+            viewHolder.itemTextView.setTextColor(buttonColor);
+
+            // TODO 쓰레드 전환 검토.
+            cartItemService.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, regId, DataTypeUtils.convertBooleanToInt(purchasedStauts));
         }
     }
 }
