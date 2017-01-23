@@ -46,6 +46,7 @@ import static java.util.stream.Collectors.toList;
  *      - 수정 팝업 액티비티 오픈 시, 예외 발생.(ㅇ)
  * (7) delete 아이콘 표시(X)
  * (8) 런처 아이콘(X)
+ * (9) 아이템이 0일 때, "저장된 아이템이 없습니다"라는 텍스트 표시(X)
  * (9) 어노테이션 라이브러리 적용
  * (10) DB ORM 적용
  * (11) 코드 리팩토링
@@ -78,12 +79,35 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Log.d("MainActivity", "onCreate() 호출!!!!");
         initActivity();
         initViews();
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("MainActivity", "onResume() 호출!!!!");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("MainActivity", "onPause() 호출!!!!");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("MainActivity", "onStop() 호출!!!!");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("MainActivity", "onDestroy() 호출!!!!");
+    }
 
     /**
      * 액티비티 초기화 작업

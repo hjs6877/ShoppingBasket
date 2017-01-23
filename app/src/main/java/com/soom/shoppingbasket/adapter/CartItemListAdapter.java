@@ -165,7 +165,7 @@ public class CartItemListAdapter extends BaseAdapter {
         }
 
         setWidget(viewHolder, position);
-
+        Log.d("CartItemListAdapter", "getView() 호출!!!!");
         return view;
     }
 
