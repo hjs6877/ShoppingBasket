@@ -59,6 +59,7 @@ import static java.util.stream.Collectors.toList;
  *      - DB Insert, Update, Delete에 대한 예외 처리.
  */
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG = "MainActivity";
     public static final int REQUEST_CODE_ITEMMODIFY = 1001;
 
     private ListView itemListView;
@@ -79,34 +80,46 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d("MainActivity", "onCreate() 호출!!!!");
+        Log.i(TAG, "onCreate() is called.");
+
         initActivity();
         initViews();
+    }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.i(TAG, "onRestart() is called.");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i(TAG, "onStart() is called.");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("MainActivity", "onResume() 호출!!!!");
+        Log.i(TAG, "onResume() is called.");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("MainActivity", "onPause() 호출!!!!");
+        Log.i(TAG, "onPause() is called.");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d("MainActivity", "onStop() 호출!!!!");
+        Log.i(TAG, "onStop() is called.");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.d("MainActivity", "onDestroy() 호출!!!!");
+        Log.i(TAG, "onDestroy() is called.");
     }
 
     /**
