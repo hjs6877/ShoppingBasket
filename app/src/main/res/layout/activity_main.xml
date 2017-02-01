@@ -6,13 +6,18 @@
     android:focusable="true"
     android:focusableInTouchMode="true">
     <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar"/>
-    <ListView
-        android:id="@+id/itemListView"
+        android:id="@+id/appbar"
+        layout="@layout/appbar"/>
+    <!-- RelativeLayout에서는 스크롤바가 생기지 않으므로, LinearLayout으로 감싸줘야 함 -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="60dp"/>
+        android:layout_height="match_parent">
+        <ListView
+            android:id="@+id/itemListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="60dp"/>
+    </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,17 +38,17 @@
                 android:id="@+id/editItemText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="추가할 아이템 입력"
+                android:hint="@string/txt_input_item"
                 android:textSize="20dp"
                 android:layout_weight="5"/>
             <Button
                 android:id="@+id/buttonAdd"
-                android:layout_width="40dp"
-                android:layout_height="32dp"
-                android:layout_marginRight="5dp"
-                android:text="추가"
+                android:layout_width="10dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="10dp"
                 android:layout_weight="1"
-                android:background="@xml/button_selector"/>
+                android:background="@xml/button_add_item_selector"
+                />
         </LinearLayout>
 
     </LinearLayout>

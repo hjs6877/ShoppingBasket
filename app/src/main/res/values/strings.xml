@@ -4,5 +4,8 @@
     <string name="action_item_delete">delete</string>
     <string name="isPurchased">isPurchased</string>
     <string name="regId">regId</string>
-    <string name="toast_no_input_item">추가할 아이템을 입력하세요.</string>
+    <string name="txt_input_item">Input your item to add.</string>
+    <string name="toast_no_input_item">Input your item to add.</string>
+    <string name="toast_no_delete_item">Please, choose items to delete.</string>
+    <string name="toast_deleted_item">Items was deleted!</string>
 </resources>

@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initActivity() {
         // 앱바 추가
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.appbar);
         setSupportActionBar(toolbar);
     }
 
@@ -184,12 +184,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void deleteCartItem(Map<Integer, CartItem> checkedItemMap) {
+        if(checkedItemMap.size() == 0) {
+            Toast.makeText(this, R.string.toast_no_delete_item, Toast.LENGTH_SHORT).show();
+            return;
+        }
         for(Map.Entry<Integer, CartItem> map : checkedItemMap.entrySet()){
             CartItem cartItem = map.getValue();
             cartItemService.deleteData(SQLData.SQL_DELETE_ITEM, cartItem.getRegId());
         }
         adapter.removeItems(checkedItemMap);
-        Toast.makeText(this, "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.toast_deleted_item, Toast.LENGTH_SHORT).show();
     }
 
     /**
