@@ -36,6 +36,14 @@ public class CartItemService {
         dbController.closeDb();
     }
 
+    public void updateIsChecked(String sql, int regId, int isChecked){
+        Log.d(TAG, "## update isChecked.");
+        Object[] sqlData = {isChecked, regId};
+        dbController.openDb();
+        dbController.getSqLiteDatabase().execSQL(sql, sqlData);
+        dbController.closeDb();
+    }
+
     public void updateCartItem(String sql, CartItem cartItem){
         Log.d(TAG, "## update cart item.");
         Object[] sqlData = {

@@ -29,6 +29,10 @@ public class SQLData {
                 "SET is_purchased=?, update_date=datetime('now') " +
                 "WHERE reg_id = ?";
 
+    public static final String SQL_UPDATE_IS_CHECKED
+            = "UPDATE cart_item " +
+            "SET is_checked=?, update_date=datetime('now') " +
+            "WHERE reg_id = ?";
 
     public static final String SQL_DELETE_ITEM
             = "DELETE FROM cart_item WHERE reg_id=?";

@@ -237,6 +237,8 @@ public class CartItemListAdapter extends BaseAdapter {
                 checkedItemMap.put(regId, cartItem);
             else
                 checkedItemMap.remove(regId);
+
+            cartItemService.updateIsChecked(SQLData.SQL_UPDATE_IS_CHECKED, regId, DataTypeUtils.convertBooleanToInt(isChecked));
         }
     }
 

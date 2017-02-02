@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.soom.shoppingbasket.adapter.CartItemListAdapter;
@@ -22,6 +23,8 @@ import com.soom.shoppingbasket.database.SQLData;
 import com.soom.shoppingbasket.model.CartItem;
 import com.soom.shoppingbasket.service.CartItemService;
 import com.soom.shoppingbasket.utils.DateUtil;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +48,7 @@ import static java.util.stream.Collectors.toList;
  * (6) 아이템 수정(ㅇ)
  *      - 수정 팝업 액티비티 오픈 시, 예외 발생.(ㅇ)
  * (7) delete 아이콘 표시(ㅇ)
- * (8) 런처 아이콘(X)
+ * (8) 런처 아이콘(ㅇ)
  * (9) 아이템이 0일 때, "저장된 아이템이 없습니다"라는 텍스트 표시(X)
  * (9) 어노테이션 라이브러리 적용
  * (10) DB ORM 적용
@@ -68,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Button buttonAdd;
     private EditText editItemText;
-
+    private TextView emptyItemTxt;
 
     private CartItemListAdapter adapter;
 
@@ -142,13 +145,24 @@ public class MainActivity extends AppCompatActivity {
         adapter = new CartItemListAdapter(this, cartItemList, dbController);
         itemListView.setAdapter(adapter);
 
+        // 아이템 long click 시, 아이템 수정을 위한 리스너 등록
+        itemListView.setOnItemLongClickListener(new ItemLongClickListener(this));
+
         // 아이템 입력을 위한 이벤트 리스너 등록.
         editItemText = (EditText) findViewById(R.id.editItemText);
         buttonAdd = (Button) findViewById(R.id.buttonAdd);
         buttonAdd.setOnClickListener(new ItemAddClickListener(this));
 
-        // 아이템 long click 시, 아이템 수정을 위한 리스너 등록
-        itemListView.setOnItemLongClickListener(new ItemLongClickListener(this));
+        emptyItemTxt = (TextView) findViewById(R.id.emptyItemTxt);
+
+        setEmptyItemTxt();
+    }
+
+    private void setEmptyItemTxt() {
+        if(adapter.getCartItemList().size() > 0)
+            emptyItemTxt.setVisibility(View.GONE);
+        else
+            emptyItemTxt.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -194,6 +208,8 @@ public class MainActivity extends AppCompatActivity {
         }
         adapter.removeItems(checkedItemMap);
         Toast.makeText(this, R.string.toast_deleted_item, Toast.LENGTH_SHORT).show();
+
+        setEmptyItemTxt();
     }
 
     /**
@@ -225,6 +241,7 @@ public class MainActivity extends AppCompatActivity {
 
                 insertItem(regId, itemText, currentDate);
                 refreshCartItems(regId, itemText, currentDate);
+                setEmptyItemTxt();
             }
 
         }
