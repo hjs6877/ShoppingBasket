@@ -50,8 +50,8 @@ import static java.util.stream.Collectors.toList;
  * (7) delete 아이콘 표시(ㅇ)
  * (8) 런처 아이콘(ㅇ)
  * (9) 아이템이 0일 때, "저장된 아이템이 없습니다"라는 텍스트 표시(X)
- * (9) 어노테이션 라이브러리 적용
- * (10) DB ORM 적용
+ * (9) 어노테이션 라이브러리 적용(X)
+ * (10) DB ORM 적용(X)
  * (11) 코드 리팩토링
  *      - MainActivity(ㅇ)
  *      - DBController(ㅇ)
@@ -59,7 +59,8 @@ import static java.util.stream.Collectors.toList;
  *      - CartItemListAdapter
  *          ㄴ CollectionUtils를 이용하여 체크 된 리스트를 CartItemList에서 제거하는 작업.(ㅇ)
  *          ㄴ getCartItemList()를 추가하고, cartItemList 사용 시, 해당 메서드 사용하도록 수정.(ㅇ)
- *      - DB Insert, Update, Delete에 대한 예외 처리.
+ *      - DB Insert, Update, Delete에 대한 예외 처리.(X)
+ * (12) 소프트 키보드 open/close 시, 리스트뷰가 refresh 되도록 수정.(X)
  */
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
