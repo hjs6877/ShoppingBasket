@@ -8,10 +8,12 @@
     <TextView
         android:id="@+id/emptyItemTxt"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="There is no items."
-        android:textColor="#000000"
-        android:layout_marginTop="60dp"/>
+        android:layout_height="match_parent"
+        android:text="@string/txt_empty_item"
+        android:textColor="#747070"
+        android:textSize="15dp"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="80dp"/>
 
     <!-- RelativeLayout에서는 스크롤바가 생기지 않으므로, LinearLayout으로 감싸줘야 함 -->
     <LinearLayout

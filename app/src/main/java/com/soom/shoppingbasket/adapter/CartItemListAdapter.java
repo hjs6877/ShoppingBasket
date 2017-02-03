@@ -174,24 +174,24 @@ public class CartItemListAdapter extends BaseAdapter {
      * @param position
      */
     private void setWidget(ViewHolder viewHolder, int position) {
-        CartItem cartItem = getItem(position);
 
-        setItemCheckBox(viewHolder, cartItem);
-        setItemTextView(viewHolder, cartItem);
-        setItemPurchasedButton(viewHolder, cartItem);
+        // TODO position 값도 파라미터로 넘겨서 CartItemList의 위젯 상태값을 업데이트 하도록 수정하고, 갱신해본다.
+        setItemCheckBox(viewHolder, position);
+        setItemTextView(viewHolder, position);
+        setItemPurchasedButton(viewHolder, position);
 
     }
 
-    private void setItemPurchasedButton(ViewHolder viewHolder, CartItem cartItem) {
+    private void setItemPurchasedButton(ViewHolder viewHolder, int position) {
+        CartItem cartItem = getItem(position);
         String buttonText = getButtonText(cartItem); // TODO DB에서 가져올 때 포함 시키도록 수정 필요.
         viewHolder.itemPurchasedButton.setText(buttonText);
-        viewHolder.itemPurchasedButton.setTag(R.string.isPurchased, isPurchased(cartItem));
-        viewHolder.itemPurchasedButton.setTag(R.string.regId, cartItem.getRegId());
 
-        viewHolder.itemPurchasedButton.setOnClickListener(new ItemPurchasedButtonClickListener(viewHolder));
+        viewHolder.itemPurchasedButton.setOnClickListener(new ItemPurchasedButtonClickListener(viewHolder, position));
     }
 
-    private void setItemTextView(ViewHolder viewHolder, CartItem cartItem) {
+    private void setItemTextView(ViewHolder viewHolder, int position) {
+        CartItem cartItem = getItem(position);
         viewHolder.itemTextView.setText(cartItem.getItemText());
 
         if(isPurchased(cartItem))
@@ -200,11 +200,11 @@ public class CartItemListAdapter extends BaseAdapter {
             viewHolder.itemTextView.setTextColor(DEFAULT_ITEM_TEXT_COLOR);
     }
 
-    private void setItemCheckBox(ViewHolder viewHolder, CartItem cartItem) {
+    private void setItemCheckBox(ViewHolder viewHolder, int position) {
+        CartItem cartItem = getItem(position);
         viewHolder.itemCheckBox.setChecked(isChecked(cartItem));
-        viewHolder.itemCheckBox.setTag(cartItem);    // 수정 및 삭제를 위한 아이템을 태그에 저장.
 
-        viewHolder.itemCheckBox.setOnCheckedChangeListener(new ItemCheckedChangeListener());
+        viewHolder.itemCheckBox.setOnCheckedChangeListener(new ItemCheckedChangeListener(position));
     }
 
     private String getButtonText(CartItem cartItem) {
@@ -223,11 +223,14 @@ public class CartItemListAdapter extends BaseAdapter {
      * 아이템을 체크 선택. 아이템 삭제 용도로 사용된다.
      */
     class ItemCheckedChangeListener implements CompoundButton.OnCheckedChangeListener{
+        private int position;
 
+        ItemCheckedChangeListener(int position){
+            this.position = position;
+        }
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            CheckBox itemCheckBox = (CheckBox) buttonView;
-            CartItem cartItem = (CartItem) itemCheckBox.getTag();
+            CartItem cartItem = cartItemList.get(position);
             int regId = cartItem.getRegId();
 
             /**
@@ -239,6 +242,7 @@ public class CartItemListAdapter extends BaseAdapter {
                 checkedItemMap.remove(regId);
 
             cartItemService.updateIsChecked(SQLData.SQL_UPDATE_IS_CHECKED, regId, DataTypeUtils.convertBooleanToInt(isChecked));
+            cartItemList.get(position).setChecked(DataTypeUtils.convertBooleanToInt(isChecked));
         }
     }
 
@@ -255,9 +259,11 @@ public class CartItemListAdapter extends BaseAdapter {
      */
     class ItemPurchasedButtonClickListener implements View.OnClickListener{
         private ViewHolder viewHolder;
+        private int position;
 
-        public ItemPurchasedButtonClickListener(ViewHolder viewHolder){
+        public ItemPurchasedButtonClickListener(ViewHolder viewHolder, int position){
             this.viewHolder = viewHolder;
+            this.position = position;
         }
 
         /**
@@ -266,10 +272,10 @@ public class CartItemListAdapter extends BaseAdapter {
          */
         @Override
         public void onClick(View v) {
-            Button button = (Button) v;
+            CartItem cartItem = getItem(position);
 
-            boolean isPurchased = (boolean) v.getTag(R.string.isPurchased);
-            int regId = (int) v.getTag(R.string.regId);
+            boolean isPurchased = DataTypeUtils.convertIntToBoolean(cartItem.isPurchased());
+            int regId = cartItem.getRegId();
             boolean purchasedStauts;
             String buttonText;
             int buttonColor;
@@ -284,12 +290,12 @@ public class CartItemListAdapter extends BaseAdapter {
                 buttonColor = Color.parseColor("#DCDCDC");
             }
 
-            button.setTag(R.string.isPurchased, purchasedStauts);
-            button.setText(buttonText);
+            viewHolder.itemPurchasedButton.setText(buttonText);
             viewHolder.itemTextView.setTextColor(buttonColor);
 
             // TODO 쓰레드 전환 검토.
             cartItemService.updateIsPurchased(SQLData.SQL_UPDATE_IS_PURCHASED, regId, DataTypeUtils.convertBooleanToInt(purchasedStauts));
+            cartItemList.get(position).setPurchased(DataTypeUtils.convertBooleanToInt(purchasedStauts));
         }
     }
 }

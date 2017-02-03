@@ -4,6 +4,7 @@
     <string name="action_item_delete">delete</string>
     <string name="isPurchased">isPurchased</string>
     <string name="regId">regId</string>
+    <string name="txt_empty_item">There is no item.</string>
     <string name="txt_input_item">Input your item to add.</string>
     <string name="toast_no_input_item">Input your item to add.</string>
     <string name="toast_no_delete_item">Please, choose items to delete.</string>
